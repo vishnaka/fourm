@@ -2,7 +2,7 @@
 Please setup .env file
 <br>
 <br>
-Admin user can post question and normal user can repy answer
+Admin user can post question and normal user can reply answer  
 <br>
 Use the following user as admin
 <br>
