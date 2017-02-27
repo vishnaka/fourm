@@ -20,7 +20,7 @@
      </div>
    @endforeach
    @else
-   <div class="col-md-8 col-md-offset-2">{{ __('messages.emptydata') }}</div>
+   <div class="empt-rec">{{ __('messages.emptydata') }}</div>
    @endif
 </div>
 @endsection

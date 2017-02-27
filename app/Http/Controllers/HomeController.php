@@ -1,4 +1,5 @@
 <?php
+
 /* ----------------------------------------------------------------------------
  * Simple Forum System - by Amila
  *
@@ -15,15 +16,9 @@ use SimpleForum\Forum as Forum;
 use SimpleForum\User as User;
 use Session;
 use Auth;
-use DB;
 use Log;
 
 class HomeController extends Controller {
-
-    // defined private table variables
-    private $forumtbl = 'forums';
-    private $replytbl = 'replies';
-    private $usertbl = 'users';
 
     /**
      * Create a constructor instance.
@@ -36,7 +31,8 @@ class HomeController extends Controller {
                             return redirect('/login');
                         }
                         $this->userId = \Auth::id(); // you can access user id here
-                        $user = User::where('id', '=', $this->userId)->first(); // get user id
+                        $user_model = new User();
+                        $user=$user_model->getUser($this->userId);//get log user
                         Session::flash('group', $user->group_id); // asign to session variable
                         return $next($request);
                     });
@@ -49,33 +45,17 @@ class HomeController extends Controller {
     /**
      * Show the application dashboard.
      * This willl load the all the questions to dashbord view
-     * @return \Illuminate\Http\Response
+     * @return post view 
      */
     public function index() {
-        try {
-            //get questions post
-            $posts = DB::table($this->forumtbl)
-                            ->join($this->usertbl, 'users.id', '=', 'forums.id')
-                            ->orderBy('forum_id', 'desc')
-                            ->get();
-
-
-            // check count of reply for question
-            if ($posts->count()) {
-                foreach ($posts as $value) {
-                    $count = DB::table($this->replytbl)->select(DB::raw('count(*) as count'))
-                                    ->where('forum_id', $value->forum_id)
-                                    ->get();
-                    foreach ($count as $val) {
-                        $value->count = $val->count; // set the count
-                    }
-                }
+            try {
+                $forum_model = new Forum();
+                $posts=$forum_model->getPostAll(true);//get questions post
+                return view('home', compact('posts')); // set the view of dashbaord
+            } catch (\Exception $e) { //exception handling
+                Log::error($e->getMessage()); // log error to file
+                return view('error.500'); // set the error page
             }
-            return view('home', compact('posts')); // set the view of dashbaord
-        } catch (\Exception $e) { //exception handling
-            Log::error($e->getMessage()); // log error to file
-            return view('error.500'); // set the error page
-        }
     }
 
 }

@@ -22,9 +22,7 @@ use DB;
 use Log;
 
 class ReplyController extends Controller {
-    // defined private table variables
-    private $replytbl = 'replies';
-    
+ 
     /**
      * Create a constructor instance.
      * This will check auth of user and set it to session
@@ -36,7 +34,8 @@ class ReplyController extends Controller {
                             return redirect('/login');
                         }
                         $this->userId = \Auth::id(); // you can access user id here
-                        $user = User::where('id', '=', $this->userId)->first(); // get user id
+                        $user_model = new User();
+                        $user=$user_model->getUser($this->userId);//get log user
                         Session::flash('group', $user->group_id); // asign to session variable
                         return $next($request);
                     });
@@ -62,16 +61,11 @@ class ReplyController extends Controller {
      */
     public function comment($id) {
         try {
+            $forum_model = new Forum();
+            $reply_model = new Reply();
             $forumId = $id; // get forum id
-            $forum = Forum::where('forum_id', $id) // fetch requird information
-                            ->first();
-
-            $comments = DB::table($this->replytbl) // get commeents for relevant forum question
-                            ->join('users', 'users.id', '=', 'replies.id')
-                            ->where('forum_id', $id)
-                            ->orderBy('reply_id', 'desc')
-                            ->get();
-
+            $forum=$forum_model->getPostEditRecord($id);//get edit question information
+            $comments=$reply_model->getReplyAll($id);//get all reply information
             return view('reply.comment', compact('forum', 'comments', 'forumId')); // set comments view
         } catch (\Exception $e) {
             //exception handling
@@ -98,13 +92,9 @@ class ReplyController extends Controller {
     public function store(ReplyPostRequest $request) {
         
         try {
-            $reply = new Reply;
-            // take all parameters from $request
-            $reply->reply = $request->reply;
-            $reply->forum_id = $request->forum_id;
-            $reply->id = $this->userId;
-            $reply->save(); // save it
-            return redirect("reply/{$reply->forum_id}/comment")->with('success', __('messages.insert')); // load the comment reply view
+            $reply_model = new Reply();
+            $reply_model->saveReplyRecord($request);//save reply record
+            return redirect("reply/{$request->forum_id}/comment")->with('success', __('messages.insert')); // load the comment reply view
         } catch (\Exception $e) {
             //exception handling
             Log::error($e->getMessage()); // log error

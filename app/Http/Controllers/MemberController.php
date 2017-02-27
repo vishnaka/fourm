@@ -14,9 +14,11 @@ use Illuminate\Http\Request;
 use SimpleForum\Http\Controllers\Controller;
 use SimpleForum\Http\Requests\MemberRequest;
 use SimpleForum\User as User;
+use SimpleForum\Groups as Groups;
 use Auth;
 use Session;
 use DB;
+use Log;
 
 class MemberController extends Controller {
     // defined private table variables
@@ -34,7 +36,8 @@ class MemberController extends Controller {
                             return redirect('/login');
                         }
                         $this->userId = \Auth::id(); // you can access user id here
-                        $user = User::where('id', '=', $this->userId)->first(); // get user id
+                        $user_model = new User();
+                        $user=$user_model->getUser($this->userId);//get log user
                         Session::flash('group', $user->group_id); // asign to session variable
                         return $next($request);
                     });
@@ -53,11 +56,8 @@ class MemberController extends Controller {
     public function index() {
 
         try {
-            // get users list
-            $member = DB::table($this->usertbl)
-                            ->join($this->grouptbl, 'users.group_id', '=', 'groups.group_id')
-                            ->orderBy('id', 'desc')
-                            ->get();
+            $user_model = new User();
+            $member=$user_model->getUserAll();//get all users list
             return view('member.index', compact('member')); // load the user list view
         } catch (\Exception $e) { //exception handling
             Log::error($e->getMessage()); // log error to file
@@ -102,12 +102,10 @@ class MemberController extends Controller {
      */
     public function edit($id) {
         try {
-            //load edit parameters
-            $user = Auth::user();
-            $member = $user::where('id', '=', $id)->firstOrFail();
-            //load user groups
-            $groups = DB::table($this->grouptbl)
-                            ->get();
+            $user_model = new User();
+            $group_model = new Groups();
+            $member=$user_model->getUser($id);//get user details
+            $groups=$group_model->getGroupAll();//get user group details
             return view('member.edit', compact('member', 'groups'));// load the user edit view
         } catch (\Exception $e) { //exception handling
             Log::error($e->getMessage());// log error to file
@@ -125,16 +123,8 @@ class MemberController extends Controller {
     public function update(MemberRequest $request, $id) {
 
         try {
-            //update user information
-            $user = Auth::user();
-            $member = $user::where('id', '=', $id)->firstOrFail();
-
-            DB::table($this->usertbl)
-            ->where('id', $id)
-            ->update(['name' => $request->name,
-            'group_id' => $request->group_id
-            ]);
-            $member->save();
+            $user_model = new User();
+            $user_model->saveUserRecord($request,$id);//get user details
             return redirect()->route('member.index')
                     ->with('success', __('messages.update'));
         } catch (\Exception $e) { //exception handling
