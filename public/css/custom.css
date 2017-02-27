@@ -1,0 +1,67 @@
+/* ----------------------------------------------------------------------------
+ * Simple Forum System - by Amila
+ *
+ * @author      Amila Tilakarathna<vishnaka23@gmail.com>
+ * @copyright   Copyright (c) 2017, Amila
+ * @link        http://forum.local/
+ * @since       v1.0.0
+ * ---------------------------------------------------------------------------- */
+
+/* Header Part*/
+
+.navbar-static-top{
+    color: #000000;
+    background-color: #dfdfdf;
+}
+
+/* End Header Part*/
+
+/* body Part*/
+
+body{
+    background-color: #FFFFFF;
+    color: #000000;
+    font-size: 1.6em;
+
+}
+
+#id-contents{
+    min-height: 490px;
+}
+
+#id-contents .panel-heading{
+    font-size: 1.4em;
+    background-color: #3097d1;
+}
+
+.time-format{
+    font-style: italic;
+}
+
+.navbar-static-top{
+    color: #000000;
+    background-color: #dfdfdf;
+}
+
+.starter-template {
+    padding: 40px 15px;
+    text-align: center;
+}
+
+.empt-rec {
+    font-size: 1.6em;
+    text-align: center;
+}
+/* End body Part*/
+
+/* Footer Part*/
+
+.add-wrapper-db{
+    background-color: #dfdfdf;
+    line-height: 20px;
+    padding-bottom: 30px;
+    padding-top: 30px;
+    text-align: center;
+}
+
+/* End Footer Part*/
